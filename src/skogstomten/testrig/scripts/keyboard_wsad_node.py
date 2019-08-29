@@ -85,7 +85,7 @@ class KeyboardWsadNode:
         # pub
         self.pub.publish(action_msg)
 
-# If no key is pressed -> nothing/pass/nemas
+# If no key is pressed -> nothing/pass/nemas 
 if __name__ == '__main__':
     try:
         kn = KeyboardWsadNode() 

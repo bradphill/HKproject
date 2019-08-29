@@ -19,7 +19,7 @@ int motor_override = 0;
 
 // pin LUT for different actions, corresponding to the keypad on a standard PC
 int pin_actions[] = {0b11111011, 0b11111010, 0b11111000,
-                     0b00110011, 0b00000000, 0b00110000,
+                     0b00110011, 0b00000000, 0b00110000,		//Unsure if they are correct 
                      0b11110111, 0b11110101, 0b11110100};
 
 int pinCalc(int action)
@@ -68,6 +68,8 @@ void action_callback(const std_msgs::Int64::ConstPtr &action_msg)
       pin_msg.data = (pin_msg.data)>>1;
     }
     if(motor_override==0){ ROS_INFO("Motor override inactive."); }
+
+    // prints in terminal window
     else{ ROS_INFO("Motor override active."); }
     ROS_INFO("Sent pins:");
     ROS_INFO("M1: enable(%d) direction(%d)", pin_unpk[0], pin_unpk[4]);
@@ -95,11 +97,11 @@ int main(int argc, char **argv)
   // init node and subs/pubs
   ros::init(argc, argv, "motor_controller_node");
   ros::NodeHandle n;
-  action_sub = n.subscribe("motor_action", 1, action_callback);
-  override_sub = n.subscribe("motor_override", 1, override_callback);
-  pin_pub = n.advertise<std_msgs::Int64>("pins", 1);
+  action_sub = n.subscribe("motor_action", 1, action_callback);		// read from topic "motor_action"
+  override_sub = n.subscribe("motor_override", 1, override_callback);	// read from topic "motor_override"
+  pin_pub = n.advertise<std_msgs::Int64>("pins", 1);			// pin_pub is a publisher to topic "pins" -> make it possible for controller.ino to read "pins" -> controll the motors
 
-  // loop away!
+  // Loop and checks all new messages in the subscribed topics above
   ros::Rate loop_rate(10);
   ros::spin();
   return 0;

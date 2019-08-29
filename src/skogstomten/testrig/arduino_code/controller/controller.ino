@@ -14,11 +14,11 @@
 #define OLED_DC     9
 #define OLED_CS     8
 
-Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
+Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS); //configuring the display
 
 // motor pins: enable 1 2 3 4, dir 1 2 3 4
 int pin_numbers[] = {47,45,43,41,39,37,35,33};
-char pin_data[] = {0,0,0,0,0,0,0,0};
+char pin_data[] = {0,0,0,0,0,0,0,0}; //should add two (four for waists?) additional motors to this pin set. Change dir to pwm?
 
 // time vars
 long long last_callback; // timestamp for last callback
@@ -42,7 +42,7 @@ void updateDisplay()
   display.setCursor(13,39);
   display.print("en");
   display.setCursor(7,51);
-  display.print("dir");
+  display.print("dir"); //should become PWM?
 
   // print table with enable and dir for each motor
   for(int i=0; i<4; i++)
@@ -69,12 +69,12 @@ void setMotors()
 {
   for(int i=0; i<8; i++)
   {
-    digitalWrite(pin_numbers[i],pin_data[i]);
+    digitalWrite(pin_numbers[i],pin_data[i]); 
   }
 }
 
 // ROS subscriber callback
-void motor_callback( const std_msgs::Int64& action_msg )
+void motor_callback( const std_msgs::Int64& action_msg ) //constant address, the function checks the data on the adress "action_msg" and updates the motor states 
 {
   // just unpacks the msg and saves new timestamp
   int in_data = action_msg.data;
@@ -90,14 +90,15 @@ void motor_callback( const std_msgs::Int64& action_msg )
 }
 
 
-ros::NodeHandle nh;
-ros::Subscriber<std_msgs::Int64> pin_sub("pins", motor_callback);
+ros::NodeHandle nh; 						  // Nodehandle is an object representing the ROS node, start the ROS node
+ros::Subscriber<std_msgs::Int64> pin_sub("pins", motor_callback); // Subrscription plan??
+	
 
 
 void setup()
 {
   // ROS init
-  nh.initNode();
+  nh.initNode();		
   nh.subscribe(pin_sub);
 
   // display init
@@ -110,7 +111,7 @@ void setup()
   // motor pin init macro
   for(int i=0; i<8; i++)
   {
-    pinMode(pin_numbers[i],OUTPUT);
+    pinMode(pin_numbers[i],OUTPUT);	//sets all the pins to OUTPUT (8 pins atm)
   }
   last_callback = millis();
 }
@@ -122,7 +123,7 @@ void loop()
   {
     for(int i=0; i<8; i++)
     {
-      pin_data[i] = 0;
+      pin_data[i] = 0;		// sets the pins to low
     }
   }
 
