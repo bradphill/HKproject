@@ -17,8 +17,9 @@
 Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS); //configuring the display
 
 // motor pins: enable 1 2 3 4, dir 1 2 3 4
-int pin_numbers[] = {47,45,43,41,39,37,35,33};
+int pin_numbers[] = {35,33,31,29,45,43,41,39};
 char pin_data[] = {0,0,0,0,0,0,0,0}; //should add two (four for waists?) additional motors to this pin set. Change dir to pwm?
+int pwm_pins[] = {2,3,4,5};
 
 // time vars
 long long last_callback; // timestamp for last callback
@@ -114,6 +115,11 @@ void setup()
     pinMode(pin_numbers[i],OUTPUT);	//sets all the pins to OUTPUT (8 pins atm)
   }
   last_callback = millis();
+  for(int i=0; i<4; i++)
+  {
+    pinMode(pwm_pins[i],OUTPUT);
+    analogWrite(pwm_pins[i],220);
+  }
 }
 
 void loop()
