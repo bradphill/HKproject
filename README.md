@@ -8,24 +8,27 @@ När ett issue är klar och kompilerar så mergas den in i master
 
 # Kommandon i terminal för git
 
-1. Git pull för senaste versionen av koden från 
+1. Git pull för senaste versionen av koden från. 
 ```bash
-cd in i din arbets mapp
+cd /user/desktop/projektmapp
 git pull origin master
 ```
 
-2. Git checkout för skapa en ny branch för ditt issue
+2. Git checkout för skapa en ny branch för ditt issue. -b för ny branch
 ```bash
 git checkout -b myBranch 
 ```
 
-3. Git status för se filer du ändrat i och vad som är "addat" till ditt repo/ branch
+3. Git status för se filer du ändrat i och vad som är "addat" till ditt repo/ branch.
+rött = inte addat
+grönt = addat
+
 ```bash
-git status (för se filer, rött=inte "addat", grönt="addat")
+git status
 git add . (punkten för lägga till alla filer, annars skriv vilken fil du vill lägga till)
 ```
 
-4. Git commit, lägger till ett meddelande med info om vad ändringen gör
+4. Git commit, lägger till ett meddelande med info om vad ändringen gör.
 ```bash
 git commit -m "info meddelande"
 ```
