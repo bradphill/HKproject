@@ -8,7 +8,7 @@ När ett issue är klar och kompilerar så mergas den in i master
 
 # Kommandon i terminal för git
 
-1. Git pull för senaste versionen av koden från. 
+1. Git pull för senaste versionen av koden från mastern. Använd branch om du vill dra ner från en sån
 ```bash
 cd /user/desktop/projektmapp
 git pull origin master
