@@ -33,10 +33,12 @@ git add . (punkten för lägga till alla filer, annars skriv vilken fil du vill 
 git commit -m "info meddelande"
 ```
 
-5.Git push, för trycka upp det på git
+5. Git push, för trycka upp det på git
 ```bash
 git push origin myBranch
 ```
+
+6. Mergar in i master på webben
 
 # Sätta upp git för första gången på din dator. 
 cd för change directory till den mapp du vill att projektet ska hamna i
