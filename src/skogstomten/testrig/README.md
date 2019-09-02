@@ -25,3 +25,23 @@ roslaunch testrig testrig.launch
 rosrun testrig keyboard_xxxx_node.py
 ```
 4. Drive!
+
+## Info om filer
+Testrig.launch 
+	startar testriggen med följande noder: 
+	motor_controller_node.cpp som motor_controller_node
+	Arduino med controller.ino som arduino_motor_node 
+
+
+Controller.ino 
+    • Tar in meddelanden från motorkontroller, topic ”pins”, läser av dem och kör önskade motorer i önskad riktning  
+    • Visualiserar även information om vilka motorer som körs och åt vilket håll på den lilla displayen (OLED). 
+
+keyboard_wsad_node.py
+    • Gör att riggen går att kontrollera med wasd-tangenterna genom att publicera meddelanden till topic ”motor_action”
+      
+motor_controller_node.cpp
+    • hämtar meddelanden från topic ”motor action”
+    • publicerar meddelanden till topic ”pins” samt ”motor_override” varav den senare inte används 
+    • Skriver ut lite information i terminalen (om motorn är på och vilket håll den roterar åt)   
+
