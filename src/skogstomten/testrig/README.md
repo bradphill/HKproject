@@ -27,14 +27,14 @@ rosrun testrig keyboard_xxxx_node.py
 4. Drive!
 
 ## Info om filer
-./startrig.sh 
+```startrig.sh```  
 Kör foljande launchfiler:
 testrig.launch (från paket testrig), startar testriggen
 rplidar.launch (från paket rplidar_ros), startar lidarn 
 sonic.launch (från paket sonic), startar ultraljudssensorer
 zed.launch (från paet zed_wrapper), startar stereokameran 
 
-Testrig.launch  
+```Testrig.launch```  
 startar testriggen med följande noder:  
 motor_controller_node  
 arduino_motor_node
