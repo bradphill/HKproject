@@ -7,6 +7,7 @@
 #include <Adafruit_GFX.h>
 
 //hej
+//HALLÅ
 // OLED pins
 #define OLED_CLK    12
 #define OLED_MOSI   11
