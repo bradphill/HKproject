@@ -47,12 +47,12 @@ pendulum_arm_control
     • Visualiserar även information om vilka motorer som körs och åt vilket håll på den lilla displayen (OLED).  
   
     
-```keyboard_wsad_node.py (Från laptop)```
+```keyboard_wsad_node.py (Från laptop)```  
     • Gör att riggen går att kontrollera med wasd-tangenterna genom att publicera meddelanden till topic ”motor_action”  
     • Gör att pendelarmarna går att kontrollera från tangentbord genom att publicera meddelanden till topic ”pendulum_action”
       
       
-```motor_controller_node (program: motor_controller_node.cpp, NVIDIA)```
+```motor_controller_node (program: motor_controller_node.cpp, NVIDIA)```  
     • hämtar meddelanden från topic ”motor_action”  
     • publicerar meddelanden till topic ”pins” samt ”motor_override” varav den senare inte används   
     • Skriver ut lite information i terminalen (om motorn är på och vilket håll den roterar åt)  
