@@ -57,17 +57,17 @@ motor_controller_node (program: motor_controller_node.cpp, NVIDIA)
     • publicerar meddelanden till topic ”pins” samt ”motor_override” varav den senare inte används   
     • Skriver ut lite information i terminalen (om motorn är på och vilket håll den roterar åt)  
 
-waist_twist_control (program: Waists2RG_Scaling_Tuned_ROS.ino, Arduino UNO (waists))
-    • hämtar meddelanden från topic ”motor_action”
-    • Midjorna svänger då fram/bak och höger/vänster trycks samtidigt 
-    • Används tangentbordskontroll styrs testriggen med WASD-knapparna, ex WD för högersväng
-    • Denna nod (arduino) måste kopplas in efter Controller.ino men före, annars hamnar noderna fel i ROS vilket medför att Testriggen inte går att köra.
+waist_twist_control (program: Waists2RG_Scaling_Tuned_ROS.ino, Arduino UNO (waists))  
+    • hämtar meddelanden från topic ”motor_action”  
+    • Midjorna svänger då fram/bak och höger/vänster trycks samtidigt   
+    • Används tangentbordskontroll styrs testriggen med WASD-knapparna, ex WD för högersväng  
+    • Denna nod (arduino) måste kopplas in efter Controller.ino men före, annars hamnar noderna fel i ROS vilket medför att Testriggen inte går att köra.  
    
-pendulum_arm_control (program: PendulumArmsSeparated_ROS.ino, Arduino UNO (pendulum))
-  • hämtar meddelanden från topic ”pendulum_acton”, svänger då fram/bak och höger/vänster trycks samtidigt 
-  • Används tangentbordskontroll styrs pendelarmarna genom att först välja vilken som ska styras (siffra 1-6) och sedan höjas (8) och sänkas (9) 
+pendulum_arm_control (program: PendulumArmsSeparated_ROS.ino, Arduino UNO (pendulum))  
+  • hämtar meddelanden från topic ”pendulum_acton”, svänger då fram/bak och höger/vänster trycks samtidigt   
+  • Används tangentbordskontroll styrs pendelarmarna genom att först välja vilken som ska styras (siffra 1-6) och sedan höjas (8) och sänkas (9)  
   • Denna nod (arduino) måste kopplas in efter arduino_motor_node och waist_twist_control, annars hamnar noderna fel i ROS 
-    vilket medför att Testriggen inte går att köra.
+    vilket medför att Testriggen inte går att köra  
   
     
 
