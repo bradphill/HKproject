@@ -93,6 +93,8 @@ rosconsole/macros_generated.h
 /opt/ros/melodic/include/ros/rosconsole/macros_generated.h
 
 /opt/ros/melodic/include/ros/console_backend.h
+ros/macros.h
+-
 
 /opt/ros/melodic/include/ros/datatypes.h
 string
@@ -315,8 +317,6 @@ boost/type_traits/remove_reference.hpp
 -
 
 /opt/ros/melodic/include/ros/platform.h
-windows.h
--
 stdlib.h
 -
 string
