@@ -6,6 +6,7 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
 
+//hej test1
 // OLED pins
 #define OLED_CLK    12
 #define OLED_MOSI   11
