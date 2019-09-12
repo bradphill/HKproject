@@ -64,22 +64,25 @@ float lastpot1Ref;        // To save last iteration's reference value for M1
 float lastpot2Ref;        // To save last iteration's reference value for M2
 float pot1Val;            // Up to date input value from potentiometer in waist 1 (M1)
 float pot2Val;            // Up to date input value from potentiometer in waist 2 (M2)
-float resol = 2;            // Resolution of when position is accepted ("potRef +- resol" is accepted as "goal reached")
 float input;              // calculated value between 0 and 1024
-float x;                  // desired turning between -100 and 100
+float x;                  // desired turning between min_angle and max_angle
 float pot1Ref;      // Potentiometer reference value for M1 (to be chosen), 500 is in the middle
 float pot2Ref;      // Potentiometer reference value for M2 (to be chosen), 500 is in the middle
-
+float actual_angle; // The current actual angle
 
 bool reached_goal_1 = false;  // goal reached for waist 1
 bool reached_goal_2 = false;  // goal reached for waist 2
 float RG_resol = 6;             // reached_goal resolution, to allow for some fluctuation from read value
+float resol = 2;            // Resolution of when position is accepted ("potRef +- resol" is accepted as "goal reached")
+
 
 // Calibration of Waist 1
 // calibration values
 float middle1 = 530;         // potentiometer value in middle
 float lower1 = 50;           // potentiometer value in minimum
 float higher1 = 940;         // potentiometer value in maximum
+float max_angle = 43.5;      // Actual positive angle at potentiometer maximum (0 in middle, negative to left, positive to right)
+float min_angle = -48.5;     // Actual negative (with sign) angle at potentiometer minimum (0 in middle, negative to left, positive to right)
 float k1;
 float m1;
 //---------------------
@@ -113,9 +116,9 @@ void setup() {
   // f(x) = kx + m
   m1 = middle1;
   if (abs(middle1-lower1) > abs(middle1-higher1)) {
-    k1 = -(higher1-m1)/100;
+    k1 = -(higher1-m1)/(max_angle);
   } else {
-    k1 = -(lower1-m1)/(-100);
+    k1 = -(lower1-m1)/(-min_angle);
   }
 
   // Initiate position
@@ -138,7 +141,9 @@ void loop() {
 
     //------------------------------ Waist 1 (M1) --------------------------------------------
     pot1Val = analogRead(pot1Pin);                               // Read potentiometer value for M1
-
+    
+    actual_angle = ref_calc_1(x, k1, m1, min_angle, max_angle)             // Calculate the current steering angle
+    
     if (pot1Val < pot1Ref - RG_resol || pot1Val > pot1Ref + RG_resol) {
       reached_goal_1 = false;
     }
@@ -188,13 +193,22 @@ void loop() {
     //---------------------------------------------------------------------------------------
 }
 
-float ref_calc_1(float x, float k1, float m1){
-  if (x < -100) {
-    x = -100;
-  }
-  if (x > 100) {
-    x = 100;
+float ref_calc_1(float x, float k1, float m1, float min_angle, float max_angle){
+  // Function that calculates the potentiometer reference value from a desired steering angle
+  float diff = min(abs(max_angle), abs(min_angle));
+  if (abs(x) > diff) {
+    if (x < 0) {
+      x = -diff;
+    } else {
+      x = diff
+    }
   }
   float result = k1*x + m1;
   return result;
+}
+
+float ref_calc_1_inv(float pot1Val, float k1, float m1){
+  // Function that calculates the angle corresponding to a potentiometer value
+  // inverse of 'ref_calc_1()'
+  float result = (pot1Val-m1)/k1;
 }
