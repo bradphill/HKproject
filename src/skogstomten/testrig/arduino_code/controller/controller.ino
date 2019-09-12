@@ -26,9 +26,6 @@ int timeout = 100; // millis to timeout (->idle state)
 int loop_rate = 100;
 
 
-// bom bom bakar underbart, kalla in nu är det dags. 
-// Min lilla ponny min lilla ponny min lilla ponnyhääst
-
 // display wrapper
 void updateDisplay()
 {
