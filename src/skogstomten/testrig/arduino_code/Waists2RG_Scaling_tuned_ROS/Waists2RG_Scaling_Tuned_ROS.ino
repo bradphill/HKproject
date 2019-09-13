@@ -34,6 +34,20 @@
 //      |    Digital<5>                  |          CTRL<6>,  PWM                   |
 //      |--------------------------------|------------------------------------------|
 
+//------------------ INCLUDES -------------------------------------------
+#include <stdio.h>
+#include <ros.h>
+#include <std_msgs/Int64.h>
+
+// ----------------- Functions ------------------------------------------
+void turn_callback(const std_msgs::Int64& action_msg);
+float ref_calc_1(float x, float k1, float m1, float min_angle, float max_angle);
+float ref_calc_1_inv(float pot1Val, float k1, float m1);
+
+//------------------ ROS ------------------------------------------------
+ros::NodeHandle nh;
+ros::Subscriber<std_msgs::Int64> turn_waist("motor_action", turn_callback);
+
 //------------------ FOR PENDULUM ARMS PWM ------------------------------
 // Does NOT affect this code!
 const int pwm3Pin = 3;    // pwm output for pendulum arms
@@ -55,6 +69,7 @@ const int pot2Pin = A1;   // Potentiometer input for M2
 //------------------ Variables to change -----------------------------------
 float factor = 0.9;         // Scaling factor (speed and distance) between waist 1 and 2 (M1 and M2)
 float pwm1 = 200;         // PWM duty cycle for waist 1 (M1)
+int turn_rate = 1;        // how much to turn for each ROS message
 
 //--------------------------------------------------------------------------
 
@@ -65,10 +80,10 @@ float lastpot2Ref;        // To save last iteration's reference value for M2
 float pot1Val;            // Up to date input value from potentiometer in waist 1 (M1)
 float pot2Val;            // Up to date input value from potentiometer in waist 2 (M2)
 float input;              // calculated value between 0 and 1024
-float x;                  // desired turning between min_angle and max_angle
+float x;                  // desired turning between -100 and 100
 float pot1Ref;      // Potentiometer reference value for M1 (to be chosen), 500 is in the middle
 float pot2Ref;      // Potentiometer reference value for M2 (to be chosen), 500 is in the middle
-float actual_angle; // The current actual angle
+float actual_angle;       // the actual angle, calculated from the current potentiometer value
 
 bool reached_goal_1 = false;  // goal reached for waist 1
 bool reached_goal_2 = false;  // goal reached for waist 2
@@ -81,7 +96,7 @@ float resol = 2;            // Resolution of when position is accepted ("potRef 
 float middle1 = 530;         // potentiometer value in middle
 float lower1 = 50;           // potentiometer value in minimum
 float higher1 = 940;         // potentiometer value in maximum
-float max_angle = 43.5;      // Actual positive angle at potentiometer maximum (0 in middle, negative to left, positive to right)
+float max_angle = 40.5;      //=46;   //=43.5;      // Actual positive angle at potentiometer maximum (0 in middle, negative to left, positive to right)
 float min_angle = -48.5;     // Actual negative (with sign) angle at potentiometer minimum (0 in middle, negative to left, positive to right)
 float k1;
 float m1;
@@ -89,12 +104,14 @@ float m1;
 
 // Calibration of Waist 2
 // calibration values
-float middle2 = 580;         // potentiometer value in middle
+float middle2 = 592;         // potentiometer value in middle
 //---------------------
 
-
-
 void setup() {
+  // ROS
+  nh.initNode();
+  nh.subscribe(turn_waist);
+  
   // configure pins
   pinMode(M1Apin, OUTPUT);
   pinMode(M1Bpin, OUTPUT);
@@ -105,7 +122,6 @@ void setup() {
   pinMode(pwm3Pin, OUTPUT);
   pinMode(pot1Pin, INPUT);
   pinMode(pot2Pin, INPUT);
-  Serial.begin(9600);     // opens serial port, sets data rate to 9600 bps
 
   // set PWM duty cycle
   analogWrite(pwm1Pin, pwm1);
@@ -116,8 +132,10 @@ void setup() {
   // f(x) = kx + m
   m1 = middle1;
   if (abs(middle1-lower1) > abs(middle1-higher1)) {
+    // distance to lower bound larger
     k1 = -(higher1-m1)/(max_angle);
   } else {
+    // distance to higher bound larger
     k1 = -(lower1-m1)/(-min_angle);
   }
 
@@ -127,22 +145,22 @@ void setup() {
 }
 
 void loop() {
-    //------------------------------ Read desired value --------------------------------------
-    if (Serial.available() > 0) {                                // if serial message is availabe
-      x = Serial.parseFloat();                                   // store as float
-      Serial.read();                                            // To ensure inpt buffer is empty. Without this parseInt() will return the number + 0.000!!!
-      input = ref_calc_1(x, k1, m1);
-      lastpot2Ref = pot2Ref;                                   // store last value for M1
-      lastpot1Ref = pot1Ref;                                   // store last value for M2
-      pot1Ref = input;                                         // set desired value as reference for M1
-      pot2Ref = lastpot2Ref+(pot1Ref-lastpot1Ref)*factor;      // calculate reference value for M2 and set it
-    }
+    //------------------------------ Read from bus -------------------------------------------
+    nh.spinOnce();
+    
+  
+    //------------------------------ Read desired value --------------------------------------                                   
+    input = ref_calc_1(x, k1, m1, min_angle, max_angle);
+    lastpot2Ref = pot2Ref;                                   // store last value for M1
+    lastpot1Ref = pot1Ref;                                   // store last value for M2
+    pot1Ref = input;                                         // set desired value as reference for M1
+    pot2Ref = lastpot2Ref+(pot1Ref-lastpot1Ref)*factor;      // calculate reference value for M2 and set it
     //----------------------------------------------------------------------------------------
 
     //------------------------------ Waist 1 (M1) --------------------------------------------
     pot1Val = analogRead(pot1Pin);                               // Read potentiometer value for M1
     
-    actual_angle = ref_calc_1(x, k1, m1, min_angle, max_angle)             // Calculate the current steering angle
+    actual_angle = ref_calc_1_inv(pot1Val, k1, m1);             // Calculate the current steering angle
     
     if (pot1Val < pot1Ref - RG_resol || pot1Val > pot1Ref + RG_resol) {
       reached_goal_1 = false;
@@ -168,8 +186,7 @@ void loop() {
 
     //------------------------------ Waist 2 (M2) --------------------------------------------
     pot2Val = analogRead(pot2Pin);                               // Read potentiometer value for M1
-    Serial.print(pot2Val);
-    Serial.print("\n");
+
     if (pot2Val < pot2Ref - RG_resol || pot2Val > pot2Ref + RG_resol) {
       reached_goal_2 = false;
     }
@@ -200,7 +217,7 @@ float ref_calc_1(float x, float k1, float m1, float min_angle, float max_angle){
     if (x < 0) {
       x = -diff;
     } else {
-      x = diff
+      x = diff;
     }
   }
   float result = k1*x + m1;
@@ -211,4 +228,30 @@ float ref_calc_1_inv(float pot1Val, float k1, float m1){
   // Function that calculates the angle corresponding to a potentiometer value
   // inverse of 'ref_calc_1()'
   float result = (pot1Val-m1)/k1;
+  return result;
+}
+
+void turn_callback(const std_msgs::Int64& action_msg) {
+  // NUMPAD action
+  //    -------
+  //     6 7 8 
+  //     3 4 5
+  //     0 1 2
+  //    -------
+  int action = action_msg.data;
+  if (action == 6 || action == 0) { // if forward/reverse to LEFT
+    x -= turn_rate;
+    if (x < -100) {
+      x = -100;
+    }
+  }
+  else if (action == 8 || action == 2) { // if forward/reverse to RIGHT
+    x += turn_rate;
+    if (x > 100) {
+      x = 100;
+    }
+  }
+  else if (action == 7 || action == 1) {
+    x = 0;
+  }
 }
