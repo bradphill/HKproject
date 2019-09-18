@@ -2,10 +2,10 @@
 //      the Arduino will be interpreted as a desired steering angle for waist 1 which this 
 //      code will aim to steer the XT-28 test rig to.
 
-//      2019-09-05
+//      2019-09-18
 //      Axel Sundkvist
 
-//      How to? Write a desired value (-100, 100) that you want the forward-most waist 
+//      How to? Write a desired vangle ca (-40, 40) that you want the forward-most waist 
 //      to turn to.
 
 //      |---------------------------------------------------------------------------|
@@ -239,19 +239,17 @@ void turn_callback(const std_msgs::Int64& action_msg) {
   //     0 1 2
   //    -------
   int action = action_msg.data;
+  float diff = min(abs(max_angle), abs(min_angle));
   if (action == 6 || action == 0) { // if forward/reverse to LEFT
-    x -= turn_rate;
-    if (x < -100) {
-      x = -100;
+    x = actual_angle - turn_rate;
+    if (x < -diff) {
+      x = -diff;
     }
   }
   else if (action == 8 || action == 2) { // if forward/reverse to RIGHT
-    x += turn_rate;
-    if (x > 100) {
-      x = 100;
+    x = actual_angle + turn_rate;
+    if (x > diff) {
+      x = diff;
     }
-  }
-  else if (action == 7 || action == 1) {
-    x = 0;
   }
 }
