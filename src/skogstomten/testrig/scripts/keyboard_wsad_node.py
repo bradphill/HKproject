@@ -26,6 +26,7 @@ class KeyboardWsadNode:
         # publisher obj
         self.pub1 = rospy.Publisher('motor_action', Int64, queue_size=1) # publish message
 	self.pub2 = rospy.Publisher('motor_pwm',Int64,queue_size=1)
+	self.pubPendulum = rospy.Publisher('pendulum_action', Int64, queue_size = 1) #should be replaced with a custom message once the power supply and fuses have been upgraded (not in this project)
 
         # loop rate
         rate = rospy.Rate(10) # checks if a button is pressed (10Hz)
@@ -76,6 +77,11 @@ class KeyboardWsadNode:
 		    self.pwm = self.pwm - 10
 		    print('pwm = {0}'.format(self.pwm))
 		    self.publish_pwm()
+            elif key.char <= '9' and key.char >= '1': 
+		self.pendulumAction = ord(key.char)-48 
+                self.publish_pendulum()
+		
+		
 
         except AttributeError: 		# if not wsad+-q (wont happen)
             pass
@@ -97,6 +103,10 @@ class KeyboardWsadNode:
 	    elif key.char == '+' or key.char == '-':
                 print('pwm = {0}'.format(self.pwm))
 		self.publish_pwm()
+            elif key.char <= '9' and key.char >= '1':
+                self.pendulumAction = 0;
+                self.publish_pendulum()
+                print "pendulum action = 0"
 	
         except AttributeError:
             pass
@@ -128,6 +138,14 @@ class KeyboardWsadNode:
 	pwm_msg = Int64()
 	pwm_msg.data = self.pwm
 	self.pub2.publish(pwm_msg)
+
+    def publish_pendulum(self):
+        #action_msg is of type Int64
+        pendulum_msg = Int64()
+        #pack action
+        pendulum_msg.data = self.pendulumAction
+        # pub
+        self.pubPendulum.publish(pendulum_msg)
 
 # If no key is pressed -> nothing/pass/nemas
 if __name__ == '__main__':
