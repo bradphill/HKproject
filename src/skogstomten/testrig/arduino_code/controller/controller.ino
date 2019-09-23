@@ -95,22 +95,39 @@ void pwm_callback( const std_msgs::Int64& pwm_msg ){
   switch (pwm){
   case 10:
   value = 26;
+  break;
+
   case 20:
   value = 51;
+  break;
+
   case 30:
   value = 77;
+  break;
+
   case 40:
   value = 102;
+  break;
+
   case 50:
   value = 128;
+  break;
+
   case 60:
   value = 153;
+  break;
+
   case 70:
   value = 179;
+  break;
+
   case 80:
   value = 204;
+  break;
+
   case 90:
   value = 230;
+  break;
   }
   for(int i=0; i<4; i++)
   {
