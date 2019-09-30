@@ -148,8 +148,8 @@ void pwm_callback( const std_msgs::Int64& pwm_msg ){
 ros::NodeHandle nh;               // Nodehandle is an object representing the ROS node, start the ROS node
 ros::Subscriber<std_msgs::Int64> pin_sub("pins", motor_callback); // Subrscription plan??
 ros::Subscriber<std_msgs::Int64> pwm_sub("change_pwm", pwm_callback);
-std_msgs::Float32MultiArray spd;
 
+std_msgs::Float32MultiArray spd;
 ros::Publisher spd_pub("wheel_speed", &spd);
 //ros::Publisher spd_pub("wheel_speed", &);
  
@@ -163,6 +163,7 @@ void setup()
   nh.subscribe(pwm_sub);
   nh.advertise(spd_pub);
 
+  spd.layout.data_length = 4;
   spd.layout.dim_length = 4;
 
   // display init
@@ -202,7 +203,7 @@ void loop()
   }
 
   for(int wheel = 0; wheel<4; wheel++){               // read encoder values for each motor and set to array spd
-    spd[wheel] = analogRead(encoder_pins[wheel])*k+m;
+    spd.data[wheel] = analogRead(encoder_pins[wheel])*k+m;
   }
   spd_pub = nh.advertise<std_msgs::Float32MultiArray>("wheel_speed", 4);
   spd_pub.publish(&spd)
