@@ -1,6 +1,6 @@
 #include <ros.h>
 #include <std_msgs/Int64.h>
-#include <stdio.h>
+#include <geometry_msgs/Twist.h>
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_SSD1306.h>
@@ -13,8 +13,8 @@
 #define OLED_DC     9
 #define OLED_CS     8
 
-Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS); //configuring the display
 
+Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS); //configuring the display
 
 int pwm_pins[] = {2,3,4,5,46,44};
 int pin_numbers[] = {35,33,31,29,45,43,41,39,49,51,25,27};
@@ -25,6 +25,18 @@ long long last_callback; // timestamp for last callback
 int timeout = 100; // millis to timeout (->idle state)
 int loop_rate = 100;
 
+//odometry data
+int encoder_pins[] = {'A12', 'A13', 'A14', 'A15'};
+float wheel_radious = 0.12; // Robot wheel radious in m
+float max_val = 818; // Max value from arduino analog inputs, used for calc resolution
+float gear_ratio = 219; // Gearbox ratio
+float max_rpm = 8000;
+
+float k = ((2*max_rpm)/max_val)*2*PI*wheel_radious/60; // speed = k*analoginput + m
+float m = max_rpm * (1/gear_ratio)*2*PI*wheel_radious/60;
+
+float analoginput;
+float spd[] = {0, 0, 0, 0};
 
 // display wrapper
 void updateDisplay()
@@ -132,6 +144,8 @@ void pwm_callback( const std_msgs::Int64& pwm_msg ){
 ros::NodeHandle nh;               // Nodehandle is an object representing the ROS node, start the ROS node
 ros::Subscriber<std_msgs::Int64> pin_sub("pins", motor_callback); // Subrscription plan??
 ros::Subscriber<std_msgs::Int64> pwm_sub("change_pwm", pwm_callback);
+geometry_msgs::Twist twist_msg;
+ros::Publisher spd_pub("wheel_speed", &twist_msg);
  
 
 
@@ -141,6 +155,7 @@ void setup()
   nh.initNode();    
   nh.subscribe(pin_sub);
   nh.subscribe(pwm_sub);
+  nh.advertise(spd_pub);
 
   // display init
   pinMode(13,OUTPUT);
@@ -160,6 +175,11 @@ void setup()
     pinMode(pwm_pins[i],OUTPUT);
     analogWrite(pwm_pins[i],26);
   }
+
+  // motor encoder pin init
+  for(int i=0; i<4; i++){
+    pinMode(encoder_pins[i],INPUT);
+  }
 }
 
 void loop()
@@ -173,9 +193,19 @@ void loop()
     }
   }
 
+  for(int wheel = 0; wheel<4; wheel++){               // read encoder values for each motor and set to array spd
+    spd[wheel] = analogRead(encoder_pins[wheel])*k+m;
+  }
+  twist_msg.data = spd;
+  spd_pub.publish( &twist_msg );
+
   // update ROS, update motors, update display, sleep
   nh.spinOnce();
   setMotors();
+
+
+  
+  
   updateDisplay();
   delay(loop_rate);
 }
