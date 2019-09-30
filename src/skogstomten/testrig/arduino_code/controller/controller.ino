@@ -5,6 +5,9 @@
 #include <Wire.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
+#include "std_msgs/MultiArrayLayout.h"
+#include "std_msgs/MultiArrayDimension.h"
+#include "std_msgs/Float32MultiArray.h"
 
 // OLED pins
 #define OLED_CLK    12
@@ -141,11 +144,14 @@ void pwm_callback( const std_msgs::Int64& pwm_msg ){
 }
 
 
+
 ros::NodeHandle nh;               // Nodehandle is an object representing the ROS node, start the ROS node
 ros::Subscriber<std_msgs::Int64> pin_sub("pins", motor_callback); // Subrscription plan??
 ros::Subscriber<std_msgs::Int64> pwm_sub("change_pwm", pwm_callback);
-geometry_msgs::Twist twist_msg;
-ros::Publisher spd_pub("wheel_speed", &twist_msg);
+std_msgs::Float32MultiArray spd;
+
+ros::Publisher spd_pub("wheel_speed", &spd);
+//ros::Publisher spd_pub("wheel_speed", &);
  
 
 
@@ -156,6 +162,8 @@ void setup()
   nh.subscribe(pin_sub);
   nh.subscribe(pwm_sub);
   nh.advertise(spd_pub);
+
+  spd.layout.dim_length = 4;
 
   // display init
   pinMode(13,OUTPUT);
@@ -196,8 +204,11 @@ void loop()
   for(int wheel = 0; wheel<4; wheel++){               // read encoder values for each motor and set to array spd
     spd[wheel] = analogRead(encoder_pins[wheel])*k+m;
   }
-  twist_msg.data = spd;
-  spd_pub.publish( &twist_msg );
+  spd_pub = nh.advertise<std_msgs::Float32MultiArray>("wheel_speed", 4);
+  spd_pub.publish(&spd)
+  
+  // twist_msg.data = spd;
+  // spd_pub.publish( &twist_msg );
 
   // update ROS, update motors, update display, sleep
   nh.spinOnce();
