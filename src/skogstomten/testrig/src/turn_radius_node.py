@@ -16,6 +16,11 @@ from geometry_msgs.msg import Point #x, y used for front and rear waist angle (f
 #Subscribes to "motor_action": this is user input which tells if the testrig 
 #should turn more or less in a specified direcion (increment turn radius)
 #
+#Subscribes to "waist_angles": this is a point message which corresponds to
+#the measured angles of the waists.
+#[x, y, z] = [front_angle, rear_angle, NULL]
+#
+#
 #Publishes "desired_radius": This is what the node thinks is the current des-
 #ired turn radius in mm.
 #
@@ -23,6 +28,9 @@ from geometry_msgs.msg import Point #x, y used for front and rear waist angle (f
 #positive angles => turn right
 #negative angles => turn left
 #[x, y, z] = [front_waist_angle, rear_waist_angle, desired_radius]
+#
+#Publishes "actual_radius": which is the calculated turn radius derived
+#from the measured waist angles
 ##-----------------------------DESCRIPTION---------------------------------##
 
 
@@ -30,6 +38,7 @@ from geometry_msgs.msg import Point #x, y used for front and rear waist angle (f
 rospy.init_node('desired_turn_radius_to_waist_angles')
 pubDesRad = rospy.Publisher('desired_radius', Int64, queue_size = 2)
 pubAngles = rospy.Publisher('cmd_waist_twists', Point, queue_size = 1)
+pubRad = rospy.Publisher('actual_radius', Int64, queue_size = 1)
 rate = rospy.Rate(10)
 ##-----------------------------INIT---------------------------------##
 
@@ -158,7 +167,16 @@ def incrementDesiredRadiusCallback(action):
             R_des = R_des + turnRate #increase radius to increase turning angle (remember that the turn radius is negative when turning left)
     pubDesRad.publish(R_des)
 
+def angleFeedbackCallback(angles):
+    a = angles.x
+    b = angles.y
 
+    Ra = calculateTurnRadius(d_f, d_m, a)
+    Rb = calculateTurnRadius(d_f, L - d_m, b) #change "d_f" to "d_r" in case front and rear config isn't the same
+    R_real = (Ra + Rb) / 2
+
+    pubRad.publish(R_real) #publish the calculated turn radius from the measured waist angles
+        
 
 
 def doStuff():
@@ -175,6 +193,7 @@ def main():
 
 	subRadius = rospy.Subscriber('cmd_turn_radius', Int64, desiredRadiusCallback)
 	subDeltaRadius = rospy.Subscriber('motor_action', Int64, incrementDesiredRadiusCallback)
+        subActualWaistAngles = rospy.Subscriber('waist_angles' Point, angleFeedbackCallback)
 	while not rospy.is_shutdown():
 		doStuff()
 		rate.sleep()
