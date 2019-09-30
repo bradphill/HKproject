@@ -8,12 +8,15 @@ from geometry_msgs.msg import Point
 ##-----------------------------DESCRIPTION---------------------------------##
 #Plans action..... 
 #
-#Subscribes to "cmd_goal": 
+#Subscribes to "cmd_goal": this is a point which represents the goal
+#[x, y, z] = [x, y, NULL]
 #
-#Subscribes to "set_pose":
+#Subscribes to "set_pose": this is a 'point' which represents the pose
+#of the testrig [x, y, z] = [x, y, yaw]
 #
 #
-#Publishes "motor_action_sw":
+#Publishes "motor_action_sw": this message is a number which the motor and
+#waist controllers can interpret and drive accordingly
 ##-----------------------------DESCRIPTION---------------------------------##
 
 
@@ -22,8 +25,14 @@ rospy.init_node('action_decider')
 pubAction = rospy.Publisher('motor_action_sw', Int64, queue_size = 2)
 rate = rospy.Rate(10)
 
-xg, yg = [0, 0] #init goal in origin
-xp, yp, yaw = [0, 0, 0] #init pose as 0, 0 ,0
+goal = Point()#[0, 0] #init goal in origin [x, y]
+goal.x = 0 #x
+goal.y = 0 #y
+
+pose = Point()
+pose.x = 0 #x
+pose.y = 0 #y
+pose.z = 0 #yaw
 ##-----------------------------INIT---------------------------------##
 
 
@@ -40,26 +49,46 @@ MAX_TURN_RADIUS = 4000 #mm
 MIN_TURN_RADIUS = 500 #mm
 turnRate = 10 #mm/increment
 ##--------------------------------------------------------##
-def setGoalCallback(goal):
-    xg, yg = [goal.x, goal.y]
+def setGoalCallback(point):
+    global goal
+    goal = point
 
-def setPoseCallback(pose)
-    xp, yp, yaw = [pose.x, pose.y, pose.z]
+def setPoseCallback(setPose)
+    global pose
+    pose = setPose
+
+def calculateAngleAndDistance():
+    global goal, pose
+
+    dx = goal.x - pose.x
+    dy = goal.y - pose.y
+    xr = np.cos(pose.z) * dx + np.sin(pose.z) * dy #x value for goal relative to the robot frame 
+    yr = (-1)*np.sin(pose.z) * dx + np.cos(pose.z) * dy #y value for goal relative to the robot frame 
+
+    goal_angle = np.atan2(yr/xr)
+    distance = np.sqrt(np.square(xr) + np.square(yr))
+
+    return distance, goal_angle
 
 def decideOnAction():
-    action_msg = Int64()
-    pubAction.publish(action_msg)
-    pass      
+    distance, angle = calculateAngleAndDistance()
+    if angle <= 0.1 and angle >= -0.1 and distance >= 50: ##if kinda infront and at least 50 mm to the point
+        action = 7
+    elif angle > 0.1 and distance >= 50: ##if to the left and at least 50 mm to the point
+        action = 6
+    elif angle < -0.1 and distance >= 50: ##if to the right and at least 50 mm to the point
+        action = 8
+    else:
+        action = 4 #stand still if no conditions are fulfilled
+    
+    return action   
 
 
 def doStuff():
-	action = decideOnAction() #positive angles mean that the testrig should turn clockwise and negative counter-clockwise
-	#print("Front angle: " + str(frontAngle) + " Rear Angle: " + str(rearAngle))
-	angles_msg = Point()
-	angles_msg.x = frontAngle
-	angles_msg.y = rearAngle
-	angles_msg.z = R_des
-	pubAngles.publish(angles_msg)
+	action = decideOnAction() #
+	action_msg = Int64()
+        action_msg.data = action
+	pubAction.publish(action_msg)
 	
 
 def main():
