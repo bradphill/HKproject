@@ -93,7 +93,7 @@ def doStuff():
 def main():
 
 	subGoal = rospy.Subscriber('cmd_goal', point, setGoalCallback)
-        subpose = rospy.Subscriber('set_pose', point, setPoseCallback)
+        subpose = rospy.Subscriber('pose', point, setPoseCallback)
 	while not rospy.is_shutdown():
 		doStuff()
 		rate.sleep()
