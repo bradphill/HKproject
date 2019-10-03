@@ -3,16 +3,15 @@
 import numpy as np
 import rospy
 from std_msgs.msg import Int64
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Twist
 
 ##-----------------------------DESCRIPTION---------------------------------##
 #Plans action..... 
 #
-#Subscribes to "cmd_goal": this is a point which represents the goal
-#[x, y, z] = [x, y, NULL]
+#Subscribes to "cmd_goal": this is a Twist msg which represents the goal
 #
-#Subscribes to "set_pose": this is a 'point' which represents the pose
-#of the testrig [x, y, z] = [x, y, yaw]
+#Subscribes to "set_pose": this is a Twist msg which represents the pose
+#of the testrig
 #
 #
 #Publishes "motor_action_sw": this message is a number which the motor and
@@ -25,14 +24,14 @@ rospy.init_node('action_decider')
 pubAction = rospy.Publisher('motor_action_sw', Int64, queue_size = 2)
 rate = rospy.Rate(10)
 
-goal = Point()#[0, 0] #init goal in origin [x, y]
-goal.x = 0 #x
-goal.y = 0 #y
+goal = Twist()
+goal.linear.x = 0 #x
+goal.linear.y = 0 #y
 
-pose = Point()
-pose.x = 0 #x
-pose.y = 0 #y
-pose.z = 0 #yaw
+pose = Twist()
+pose.linear.x = 0 #x
+pose.linear.y = 0 #y
+pose.angular.z = 0 #yaw
 ##-----------------------------INIT---------------------------------##
 
 
@@ -60,10 +59,10 @@ def setPoseCallback(setPose)
 def calculateAngleAndDistance():
     global goal, pose
 
-    dx = goal.x - pose.x
-    dy = goal.y - pose.y
-    xr = np.cos(pose.z) * dx + np.sin(pose.z) * dy #x value for goal relative to the robot frame 
-    yr = (-1)*np.sin(pose.z) * dx + np.cos(pose.z) * dy #y value for goal relative to the robot frame 
+    dx = goal.linear.x - pose.linear.x
+    dy = goal.linear.y - pose.linear.y
+    xr = np.cos(pose.angular.z) * dx + np.sin(pose.angular.z) * dy #x value for goal relative to the robot frame 
+    yr = (-1)*np.sin(pose.angular.z) * dx + np.cos(pose.angular.z) * dy #y value for goal relative to the robot frame 
 
     goal_angle = np.atan2(yr/xr)
     distance = np.sqrt(np.square(xr) + np.square(yr))
