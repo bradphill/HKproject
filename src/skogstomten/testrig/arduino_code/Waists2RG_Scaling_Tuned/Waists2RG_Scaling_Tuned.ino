@@ -5,7 +5,7 @@
 //      2019-09-05
 //      Axel Sundkvist
 
-//      How to? Write a desired value (-100, 100) that you want the forward-most waist 
+//      How to? Write a desired angle (-48.5, 40.5) that you want the forward-most waist 
 //      to turn to.
 
 //      |---------------------------------------------------------------------------|
@@ -50,7 +50,7 @@ const int pwm2Pin = 5;    // pwm output for M2
 const int pot1Pin = A0;   // Potentiometer input for M1
 const int pot2Pin = A1;   // Potentiometer input for M2
 
-//-------------------------------------------------------------------------
+//-----------------------------------------100--------------------------------
 
 //------------------ Variables to change -----------------------------------
 float factor = 0.9;         // Scaling factor (speed and distance) between waist 1 and 2 (M1 and M2)
@@ -59,16 +59,19 @@ float pwm1 = 200;         // PWM duty cycle for waist 1 (M1)
 //--------------------------------------------------------------------------
 
 //------------------ Variables ---------------------------------------------
-float pwm2 = pwm1*factor; // PWM duty cycle for waist 2 (M2), calculated as "pwm1*factor"
+float pwm2 = pwm1;//*factor; // PWM duty cycle for waist 2 (M2), calculated as "pwm1*factor"
 float lastpot1Ref;        // To save last iteration's reference value for M1
 float lastpot2Ref;        // To save last iteration's reference value for M2
 float pot1Val;            // Up to date input value from potentiometer in waist 1 (M1)
 float pot2Val;            // Up to date input value from potentiometer in waist 2 (M2)
-float input;              // calculated value between 0 and 1024
-float x;                  // desired turning between min_angle and max_angle
+float input1;              // calculated value between 0 and 1024
+float input2;
+float x;                  // desired turning between min_angle1 and max_angle1
+float y;                  // desired turning between min_angle2 and max_angle2
 float pot1Ref;      // Potentiometer reference value for M1 (to be chosen), 500 is in the middle
 float pot2Ref;      // Potentiometer reference value for M2 (to be chosen), 500 is in the middle
-float actual_angle; // The current actual angle
+float actual_angle1; // The current actual angle of front waist
+float actual_angle2; // The current actual angle of back waist
 
 bool reached_goal_1 = false;  // goal reached for waist 1
 bool reached_goal_2 = false;  // goal reached for waist 2
@@ -81,8 +84,8 @@ float resol = 2;            // Resolution of when position is accepted ("potRef 
 float middle1 = 530;         // potentiometer value in middle
 float lower1 = 50;           // potentiometer value in minimum
 float higher1 = 940;         // potentiometer value in maximum
-float max_angle = 40.5;      //=   //=43.5;      // Actual positive angle at potentiometer maximum (0 in middle, negative to left, positive to right)
-float min_angle = -48.5;     // Actual negative (with sign) angle at potentiometer minimum (0 in middle, negative to left, positive to right)
+float max_angle1 = 40.5;      //=   //=43.5;      // Actual positive angle at potentiometer maximum (0 in middle, negative to left, positive to right)
+float min_angle1 = -48.5;     // Actual negative (with sign) angle at potentiometer minimum (0 in middle, negative to left, positive to right)
 float k1;
 float m1;
 //---------------------
@@ -90,6 +93,12 @@ float m1;
 // Calibration of Waist 2
 // calibration values
 float middle2 = 592;         // potentiometer value in middle
+float lower2 = 50;           // potentiometer value in minimum
+float higher2 = 940;         // potentiometer value in maximum
+float max_angle2 = 40.5;      //=   //=43.5;      // Actual positive angle at potentiometer maximum (0 in middle, negative to left, positive to right)
+float min_angle2 = -48.5;     // Actual negative (with sign) angle at potentiometer minimum (0 in middle, negative to left, positive to right)
+float k2;
+float m2;
 //---------------------
 
 
@@ -117,12 +126,22 @@ void setup() {
   m1 = middle1;
   if (abs(middle1-lower1) > abs(middle1-higher1)) {
     // distance to lower bound larger
-    k1 = -(higher1-m1)/(max_angle);
+    k1 = -(higher1-m1)/(max_angle1);
   } else {
     // distance to higher bound larger
-    k1 = -(lower1-m1)/(-min_angle);
+    k1 = -(lower1-m1)/(-min_angle1);
   }
 
+  // Calibration of Waist 2
+  // f(x) = kx + m
+  m2 = middle2;
+  if (abs(middle2-lower2) > abs(middle2-higher2)) {
+    // distance to lower bound larger
+    k2 = -(higher2-m2)/(max_angle2);
+  } else {
+    // distance to higher bound larger
+    k2 = -(lower2-m2)/(-min_angle2);
+  }
   // Initiate position
   pot1Ref = middle1;
   pot2Ref = middle2;
@@ -132,21 +151,21 @@ void loop() {
     //------------------------------ Read desired value --------------------------------------
     if (Serial.available() > 0) {                                // if serial message is availabe
       x = Serial.parseFloat();                                   // store as float
+      y = Serial.parseFloat();
       Serial.read();                                            // To ensure inpt buffer is empty. Without this parseInt() will return the number + 0.000!!!
-      input = ref_calc_1(x, k1, m1, min_angle, max_angle);
+      input1 = ref_calc(x, k1, m1, min_angle1, max_angle1);
+      input2 = ref_calc(y, k2, m2, min_angle2, max_angle2);
       lastpot2Ref = pot2Ref;                                   // store last value for M1
       lastpot1Ref = pot1Ref;                                   // store last value for M2
-      pot1Ref = input;                                         // set desired value as reference for M1
-      pot2Ref = lastpot2Ref+(pot1Ref-lastpot1Ref)*factor;      // calculate reference value for M2 and set it
+      pot1Ref = input1;                                         // set desired value as reference for M1
+      pot2Ref = input2;//lastpot2Ref+(pot1Ref-lastpot1Ref)*factor;      // calculate reference value for M2 and set it
     }
     //----------------------------------------------------------------------------------------
 
     //------------------------------ Waist 1 (M1) --------------------------------------------
     pot1Val = analogRead(pot1Pin);                               // Read potentiometer value for M1
+    actual_angle1 = ref_calc_inv(pot1Val, k1, m1);             // Calculate the current steering angle
     
-    actual_angle = ref_calc_1_inv(pot1Val, k1, m1);             // Calculate the current steering angle
-    Serial.print(actual_angle);
-    Serial.print("\n");
     
     if (pot1Val < pot1Ref - RG_resol || pot1Val > pot1Ref + RG_resol) {
       reached_goal_1 = false;
@@ -172,7 +191,12 @@ void loop() {
 
     //------------------------------ Waist 2 (M2) --------------------------------------------
     pot2Val = analogRead(pot2Pin);                               // Read potentiometer value for M1
+    actual_angle2 = ref_calc_inv(pot2Val, k2, m2);
 
+    Serial.print(actual_angle1);
+    Serial.print(" ");
+    Serial.println(actual_angle2);
+    
     if (pot2Val < pot2Ref - RG_resol || pot2Val > pot2Ref + RG_resol) {
       reached_goal_2 = false;
     }
@@ -196,7 +220,7 @@ void loop() {
     //---------------------------------------------------------------------------------------
 }
 
-float ref_calc_1(float x, float k1, float m1, float min_angle, float max_angle){
+float ref_calc(float x, float k, float m, float min_angle, float max_angle){
   // Function that calculates the potentiometer reference value from a desired steering angle
   float diff = min(abs(max_angle), abs(min_angle));
   if (abs(x) > diff) {
@@ -206,13 +230,13 @@ float ref_calc_1(float x, float k1, float m1, float min_angle, float max_angle){
       x = diff;
     }
   }
-  float result = k1*x + m1;
+  float result = k*x + m;
   return result;
 }
 
-float ref_calc_1_inv(float pot1Val, float k1, float m1){
+float ref_calc_inv(float potVal, float k, float m){
   // Function that calculates the angle corresponding to a potentiometer value
-  // inverse of 'ref_calc_1()'
-  float result = (pot1Val-m1)/k1;
+  // inverse of 'ref_calc()'
+  float result = (potVal-m)/k;
   return result;
 }

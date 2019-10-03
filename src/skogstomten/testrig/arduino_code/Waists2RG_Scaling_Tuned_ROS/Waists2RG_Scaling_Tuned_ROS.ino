@@ -38,15 +38,18 @@
 #include <stdio.h>
 #include <ros.h>
 #include <std_msgs/Int64.h>
+#include <geometry_msgs/Point.h>
 
 // ----------------- Functions ------------------------------------------
 void turn_callback(const std_msgs::Int64& action_msg);
-float ref_calc_1(float x, float k1, float m1, float min_angle, float max_angle);
-float ref_calc_1_inv(float pot1Val, float k1, float m1);
+void angle_callback(const geometry_msgs::Point& point_msg);
+float ref_calc(float x, float k, float m, float min_angle, float max_angle);
+float ref_calc_inv(float potVal, float k, float m);
 
 //------------------ ROS ------------------------------------------------
 ros::NodeHandle nh;
 ros::Subscriber<std_msgs::Int64> turn_waist("motor_action", turn_callback);
+ros::Subscriber<geometry_msgs::Point> waist_angle("cmd_waists_twists",angle_callback);
 
 //------------------ FOR PENDULUM ARMS PWM ------------------------------
 // Does NOT affect this code!
@@ -74,16 +77,19 @@ int turn_rate = 1;        // how much to turn for each ROS message
 //--------------------------------------------------------------------------
 
 //------------------ Variables ---------------------------------------------
-float pwm2 = pwm1*factor; // PWM duty cycle for waist 2 (M2), calculated as "pwm1*factor"
+float pwm2 = pwm1;//*factor; // PWM duty cycle for waist 2 (M2), calculated as "pwm1*factor"
 float lastpot1Ref;        // To save last iteration's reference value for M1
 float lastpot2Ref;        // To save last iteration's reference value for M2
 float pot1Val;            // Up to date input value from potentiometer in waist 1 (M1)
 float pot2Val;            // Up to date input value from potentiometer in waist 2 (M2)
-float input;              // calculated value between 0 and 1024
+float input1;              // calculated value between 0 and 1024
+float input2;
 float x;                  // desired turning between -100 and 100
+float y;
 float pot1Ref;      // Potentiometer reference value for M1 (to be chosen), 500 is in the middle
 float pot2Ref;      // Potentiometer reference value for M2 (to be chosen), 500 is in the middle
-float actual_angle;       // the actual angle, calculated from the current potentiometer value
+float actual_angle1;       // the actual angle, calculated from the current potentiometer value
+float actual_angle2;
 
 bool reached_goal_1 = false;  // goal reached for waist 1
 bool reached_goal_2 = false;  // goal reached for waist 2
@@ -96,8 +102,8 @@ float resol = 2;            // Resolution of when position is accepted ("potRef 
 float middle1 = 530;         // potentiometer value in middle
 float lower1 = 50;           // potentiometer value in minimum
 float higher1 = 940;         // potentiometer value in maximum
-float max_angle = 40.5;      //=46;   //=43.5;      // Actual positive angle at potentiometer maximum (0 in middle, negative to left, positive to right)
-float min_angle = -48.5;     // Actual negative (with sign) angle at potentiometer minimum (0 in middle, negative to left, positive to right)
+float max_angle1 = 40.5;      //=46;   //=43.5;      // Actual positive angle at potentiometer maximum (0 in middle, negative to left, positive to right)
+float min_angle1 = -48.5;     // Actual negative (with sign) angle at potentiometer minimum (0 in middle, negative to left, positive to right)
 float k1;
 float m1;
 //---------------------
@@ -105,6 +111,12 @@ float m1;
 // Calibration of Waist 2
 // calibration values
 float middle2 = 592;         // potentiometer value in middle
+float lower2 = 50;           // potentiometer value in minimum
+float higher2 = 940;         // potentiometer value in maximum
+float max_angle2 = 40.5;      //=46;   //=43.5;      // Actual positive angle at potentiometer maximum (0 in middle, negative to left, positive to right)
+float min_angle2 = -48.5;     // Actual negative (with sign) angle at potentiometer minimum (0 in middle, negative to left, positive to right)
+float k2;
+float m2;
 //---------------------
 
 void setup() {
@@ -133,10 +145,21 @@ void setup() {
   m1 = middle1;
   if (abs(middle1-lower1) > abs(middle1-higher1)) {
     // distance to lower bound larger
-    k1 = -(higher1-m1)/(max_angle);
+    k1 = -(higher1-m1)/(max_angle1);
   } else {
     // distance to higher bound larger
-    k1 = -(lower1-m1)/(-min_angle);
+    k1 = -(lower1-m1)/(-min_angle1);
+  }
+
+  // Calibration of Waist 2
+  // f(x) = kx + m
+  m2 = middle2;
+  if (abs(middle2-lower2) > abs(middle2-higher2)) {
+    // distance to lower bound larger
+    k2 = -(higher2-m2)/(max_angle2);
+  } else {
+    // distance to higher bound larger
+    k2 = -(lower2-m2)/(-min_angle2);
   }
 
   // Initiate position
@@ -150,17 +173,17 @@ void loop() {
     
   
     //------------------------------ Read desired value --------------------------------------                                   
-    input = ref_calc_1(x, k1, m1, min_angle, max_angle);
+    input1 = ref_calc(x, k1, m1, min_angle1, max_angle1);
+    input2 = ref_calc(y, k2, m2, min_angle2, max_angle2);
     lastpot2Ref = pot2Ref;                                   // store last value for M1
     lastpot1Ref = pot1Ref;                                   // store last value for M2
-    pot1Ref = input;                                         // set desired value as reference for M1
-    pot2Ref = lastpot2Ref+(pot1Ref-lastpot1Ref)*factor;      // calculate reference value for M2 and set it
+    pot1Ref = input1;                                         // set desired value as reference for M1
+    pot2Ref = input2;//lastpot2Ref+(pot1Ref-lastpot1Ref)*factor;      // calculate reference value for M2 and set it
     //----------------------------------------------------------------------------------------
 
     //------------------------------ Waist 1 (M1) --------------------------------------------
     pot1Val = analogRead(pot1Pin);                               // Read potentiometer value for M1
-    
-    actual_angle = ref_calc_1_inv(pot1Val, k1, m1);             // Calculate the current steering angle
+    actual_angle1 = ref_calc_inv(pot1Val, k1, m1);             // Calculate the current steering angle
     
     if (pot1Val < pot1Ref - RG_resol || pot1Val > pot1Ref + RG_resol) {
       reached_goal_1 = false;
@@ -186,7 +209,8 @@ void loop() {
 
     //------------------------------ Waist 2 (M2) --------------------------------------------
     pot2Val = analogRead(pot2Pin);                               // Read potentiometer value for M1
-
+    actual_angle2 = ref_calc_inv(pot2Val, k2, m2);
+    
     if (pot2Val < pot2Ref - RG_resol || pot2Val > pot2Ref + RG_resol) {
       reached_goal_2 = false;
     }
@@ -210,7 +234,7 @@ void loop() {
     //---------------------------------------------------------------------------------------
 }
 
-float ref_calc_1(float x, float k1, float m1, float min_angle, float max_angle){
+float ref_calc(float x, float k, float m, float min_angle, float max_angle){
   // Function that calculates the potentiometer reference value from a desired steering angle
   float diff = min(abs(max_angle), abs(min_angle));
   if (abs(x) > diff) {
@@ -220,14 +244,14 @@ float ref_calc_1(float x, float k1, float m1, float min_angle, float max_angle){
       x = diff;
     }
   }
-  float result = k1*x + m1;
+  float result = k*x + m;
   return result;
 }
 
-float ref_calc_1_inv(float pot1Val, float k1, float m1){
+float ref_calc_inv(float potVal, float k, float m){
   // Function that calculates the angle corresponding to a potentiometer value
-  // inverse of 'ref_calc_1()'
-  float result = (pot1Val-m1)/k1;
+  // inverse of 'ref_calc()'
+  float result = (potVal-m)/k;
   return result;
 }
 
@@ -239,17 +263,22 @@ void turn_callback(const std_msgs::Int64& action_msg) {
   //     0 1 2
   //    -------
   int action = action_msg.data;
-  float diff = min(abs(max_angle), abs(min_angle));
+  float diff = min(abs(max_angle1), abs(min_angle1));
   if (action == 6 || action == 0) { // if forward/reverse to LEFT
-    x = actual_angle - turn_rate;
+    x = actual_angle1 - turn_rate;
     if (x < -diff) {
       x = -diff;
     }
   }
   else if (action == 8 || action == 2) { // if forward/reverse to RIGHT
-    x = actual_angle + turn_rate;
+    x = actual_angle1 + turn_rate;
     if (x > diff) {
       x = diff;
     }
   }
+}
+
+void angle_callback(const geometry_msgs::Point& point_msg){
+  x = point_msg.x;
+  y = point_msg.y;
 }
