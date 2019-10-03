@@ -100,7 +100,7 @@ def doStuff():
 
 def main():
 
-    subRadius = rospy.Subscriber('turn_radius', Int64, setTurnRadiusCallback)
+    subRadius = rospy.Subscriber('actual_radius', Int64, setTurnRadiusCallback)
 	subSpeed = rospy.Subscriber('speed', Int64, setSpeedCallback)
     subpose = rospy.Subscriber('pose', Twist, setPoseCallback)
 	while not rospy.is_shutdown():
