@@ -50,18 +50,18 @@ R_des = 1000 #desired turn radius from center of body along middle wheel axle (m
 L = 500 #distance between the two waists
 d_f = 235 #distance between front waist and front wheel axle
 d_m = 285 #distance between front waist and middle wheel axle
-d_r = 235 #distance between front waist and rear wheel axle
-allowedTwist = [0, 45] #maximum twist of waists
+d_r = 235 #distance between rear waist and rear wheel axle
+allowedTwist = [0, 40] #maximum twist of waists
 tolerance = 0.01 #percentage based error tolerance for acceptable turn radius
 iterationLimit = 1500 #maximum amount of iterations
 MAX_TURN_RADIUS = 4000 #mm
-MIN_TURN_RADIUS = 500 #mm
+MIN_TURN_RADIUS = 600 #mm
 turnRate = 10 #mm/increment
 ##--------------------------------------------------------##
 
 
 #calculate the turn radius based on waist twist and distance between the waist and motor axes in the top plane
-def calculateTurnRadius(d_e, d_m, angleDegrees):
+def calculateTurnRadius(d_e, d_m, angleDegrees): #distance between rotational joint and end wheel axis in top plane, -||- middle -||-
     angle = angleDegrees * np.pi / 180 #angle of waist in rad
     oppositeAngle = np.pi/2 - angle
     
@@ -86,7 +86,7 @@ def iterateWaistTwist(): #input desired turn radius
     
     while iterations < iterationLimit:
         Rf = calculateTurnRadius(d_f, d_m, alpha)
-        Rr = calculateTurnRadius(d_f, L - d_m, beta) #change "d_f" to "d_r" in case front and rear config isn't the same
+        Rr = calculateTurnRadius(d_r, L - d_m, beta) #change "d_f" to "d_r" in case front and rear config isn't the same
         
         #print("Calculated turn radius: " + str(Rf) + " Using front angle: " + str(alpha))
         #print("Calculated turn radius: " + str(Rr) + " Using rear angle: " + str(beta))
