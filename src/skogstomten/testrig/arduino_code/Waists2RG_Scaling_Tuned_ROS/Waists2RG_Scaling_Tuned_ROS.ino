@@ -48,8 +48,14 @@ float ref_calc_inv(float potVal, float k, float m);
 
 //------------------ ROS ------------------------------------------------
 ros::NodeHandle nh;
-ros::Subscriber<std_msgs::Int64> turn_waist("motor_action", turn_callback);
-ros::Subscriber<geometry_msgs::Point> waist_angle("cmd_waists_twists",angle_callback);
+//ros::Subscriber<std_msgs::Int64> turn_waist("motor_action", turn_callback);
+ros::Subscriber<geometry_msgs::Point> waist_angle("cmd_waist_twists",angle_callback);
+geometry_msgs::Point angle_out;
+ros::Publisher angle_publish("waist_angles", &angle_out);
+
+std_msgs::Int64 debug_point;
+ros::Publisher debug_publisher("debug_waist_topic", &debug_point);
+
 
 //------------------ FOR PENDULUM ARMS PWM ------------------------------
 // Does NOT affect this code!
@@ -70,7 +76,7 @@ const int pot2Pin = A1;   // Potentiometer input for M2
 //-------------------------------------------------------------------------
 
 //------------------ Variables to change -----------------------------------
-float factor = 0.9;         // Scaling factor (speed and distance) between waist 1 and 2 (M1 and M2)
+//float factor = 0.9;         // Scaling factor (speed and distance) between waist 1 and 2 (M1 and M2) //DEPRECATED! ANGLES DETERMINED INDIVIDUALLY THROUGH ROS
 float pwm1 = 200;         // PWM duty cycle for waist 1 (M1)
 int turn_rate = 1;        // how much to turn for each ROS message
 
@@ -122,8 +128,9 @@ float m2;
 void setup() {
   // ROS
   nh.initNode();
-  nh.subscribe(turn_waist);
-  
+  //nh.subscribe(turn_waist); //DEPRECATED. this was replaced by waist_angle
+  nh.subscribe(waist_angle);
+  nh.advertise(angle_publish);
   // configure pins
   pinMode(M1Apin, OUTPUT);
   pinMode(M1Bpin, OUTPUT);
@@ -158,7 +165,7 @@ void setup() {
     // distance to lower bound larger
     k2 = -(higher2-m2)/(max_angle2);
   } else {
-    // distance to higher bound larger
+    // distance to higher bound largerlastpot2Ref+(pot1Ref-lastpot1Ref)*factor;
     k2 = -(lower2-m2)/(-min_angle2);
   }
 
@@ -178,12 +185,14 @@ void loop() {
     lastpot2Ref = pot2Ref;                                   // store last value for M1
     lastpot1Ref = pot1Ref;                                   // store last value for M2
     pot1Ref = input1;                                         // set desired value as reference for M1
-    pot2Ref = input2;//lastpot2Ref+(pot1Ref-lastpot1Ref)*factor;      // calculate reference value for M2 and set it
+    pot2Ref = input2;//lastpot2Ref+(pot1Ref-lastpot1Ref)*factor;//input2;//      // calculate reference value for M2 and set it
+
     //----------------------------------------------------------------------------------------
 
     //------------------------------ Waist 1 (M1) --------------------------------------------
     pot1Val = analogRead(pot1Pin);                               // Read potentiometer value for M1
     actual_angle1 = ref_calc_inv(pot1Val, k1, m1);             // Calculate the current steering angle
+    angle_out.x = actual_angle1;
     
     if (pot1Val < pot1Ref - RG_resol || pot1Val > pot1Ref + RG_resol) {
       reached_goal_1 = false;
@@ -210,6 +219,7 @@ void loop() {
     //------------------------------ Waist 2 (M2) --------------------------------------------
     pot2Val = analogRead(pot2Pin);                               // Read potentiometer value for M1
     actual_angle2 = ref_calc_inv(pot2Val, k2, m2);
+    angle_out.y = actual_angle2;
     
     if (pot2Val < pot2Ref - RG_resol || pot2Val > pot2Ref + RG_resol) {
       reached_goal_2 = false;
@@ -232,6 +242,7 @@ void loop() {
       digitalWrite(M2Apin, LOW);
     }
     //---------------------------------------------------------------------------------------
+    angle_publish.publish(&angle_out);
 }
 
 float ref_calc(float x, float k, float m, float min_angle, float max_angle){
@@ -255,6 +266,7 @@ float ref_calc_inv(float potVal, float k, float m){
   return result;
 }
 
+//Deprecated. Turning is handled in ros
 void turn_callback(const std_msgs::Int64& action_msg) {
   // NUMPAD action
   //    -------
