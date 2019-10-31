@@ -7,4 +7,4 @@
 # new environment variables
 
 # modified environment variables
-export PWD="/home/skogforsk/HKproj/catkin_ws/build"
+export PWD="/home/linus/Documents/Skola/HKproject/build"

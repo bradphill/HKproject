@@ -1,8 +1,0 @@
-prefix=/home/skogforsk/catkin_ws/install
-
-Name: lumber_example
-Description: Description of lumber_example
-Version: 0.0.1
-Cflags: -I/home/skogforsk/catkin_ws/install/include
-Libs: -L/home/skogforsk/catkin_ws/install/lib 
-Requires: roscpp std_msgs

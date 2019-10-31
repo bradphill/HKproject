@@ -67,14 +67,14 @@ set(testrig_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("TRUE" STREQUAL "TRUE")
-  set(testrig_SOURCE_PREFIX /home/skogforsk/catkin_ws/src/skogstomten/testrig)
-  set(testrig_DEVEL_PREFIX /home/skogforsk/catkin_ws/devel)
+  set(testrig_SOURCE_PREFIX /home/linus/Documents/Skola/HKproject/src/testrig)
+  set(testrig_DEVEL_PREFIX /home/linus/Documents/Skola/HKproject/devel)
   set(testrig_INSTALL_PREFIX "")
   set(testrig_PREFIX ${testrig_DEVEL_PREFIX})
 else()
   set(testrig_SOURCE_PREFIX "")
   set(testrig_DEVEL_PREFIX "")
-  set(testrig_INSTALL_PREFIX /home/skogforsk/catkin_ws/install)
+  set(testrig_INSTALL_PREFIX /home/linus/Documents/Skola/HKproject/install)
   set(testrig_PREFIX ${testrig_INSTALL_PREFIX})
 endif()
 
@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(testrig_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/home/skogforsk/catkin_ws/src/skogstomten/testrig/include " STREQUAL " ")
+if(NOT " " STREQUAL " ")
   set(testrig_INCLUDE_DIRS "")
-  set(_include_dirs "/home/skogforsk/catkin_ws/src/skogstomten/testrig/include")
+  set(_include_dirs "")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -110,7 +110,7 @@ if(NOT "/home/skogforsk/catkin_ws/src/skogstomten/testrig/include " STREQUAL " "
         message(FATAL_ERROR "Project 'testrig' specifies '${idir}' as an include dir, which is not found.  It does not exist in '${include}'.  ${_report}")
       endif()
     else()
-      message(FATAL_ERROR "Project 'testrig' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/skogforsk/catkin_ws/src/skogstomten/testrig/${idir}'.  ${_report}")
+      message(FATAL_ERROR "Project 'testrig' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/linus/Documents/Skola/HKproject/src/testrig/${idir}'.  ${_report}")
     endif()
     _list_append_unique(testrig_INCLUDE_DIRS ${include})
   endforeach()
@@ -131,7 +131,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/skogforsk/catkin_ws/devel/lib;/home/skogforsk/HKproj/catkin_ws/devel/lib;/home/skogforsk/catkin_ws/devel/lib;/opt/ros/melodic/lib)
+    foreach(path /home/linus/Documents/Skola/HKproject/devel/lib;/home/linus/Documents/Skola/HKproject/devel/lib;/opt/ros/melodic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
@@ -162,7 +162,7 @@ foreach(t ${testrig_EXPORTED_TARGETS})
   endif()
 endforeach()
 
-set(depends "roscpp;std_msgs")
+set(depends "")
 foreach(depend ${depends})
   string(REPLACE " " ";" depend_list ${depend})
   # the package name of the dependency must be kept in a unique variable so that it is not overwritten in recursive calls

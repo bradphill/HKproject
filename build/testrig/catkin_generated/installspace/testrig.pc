@@ -1,0 +1,8 @@
+prefix=/home/linus/Documents/Skola/HKproject/install
+
+Name: testrig
+Description: Description of testrig
+Version: 1.0.0
+Cflags: 
+Libs: -L/home/linus/Documents/Skola/HKproject/install/lib 
+Requires: 

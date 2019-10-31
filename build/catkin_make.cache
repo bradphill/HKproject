@@ -1,2 +1,2 @@
-beginner_tutorials:skogstomten/lumber_example:skogstomten/skogstomten:skogstomten/testrig
--DCATKIN_DEVEL_PREFIX=/home/skogforsk/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/skogforsk/catkin_ws/install -G Unix Makefiles
+testrig
+-DCATKIN_DEVEL_PREFIX=/home/linus/Documents/Skola/HKproject/devel -DCMAKE_INSTALL_PREFIX=/home/linus/Documents/Skola/HKproject/install -G Unix Makefiles

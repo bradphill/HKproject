@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/skogforsk/catkin_ws/src
+CMAKE_SOURCE_DIR = /home/linus/Documents/Skola/HKproject/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/skogforsk/catkin_ws/build
+CMAKE_BINARY_DIR = /home/linus/Documents/Skola/HKproject/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -137,9 +137,9 @@ test/fast: test
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/skogforsk/catkin_ws/build/CMakeFiles /home/skogforsk/catkin_ws/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/linus/Documents/Skola/HKproject/build/CMakeFiles /home/linus/Documents/Skola/HKproject/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/skogforsk/catkin_ws/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/linus/Documents/Skola/HKproject/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -285,19 +285,6 @@ gtest/fast:
 .PHONY : gtest/fast
 
 #=============================================================================
-# Target rules for targets named _catkin_empty_exported_target
-
-# Build rule for target.
-_catkin_empty_exported_target: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 _catkin_empty_exported_target
-.PHONY : _catkin_empty_exported_target
-
-# fast build rule for target.
-_catkin_empty_exported_target/fast:
-	$(MAKE) -f skogstomten/skogstomten/CMakeFiles/_catkin_empty_exported_target.dir/build.make skogstomten/skogstomten/CMakeFiles/_catkin_empty_exported_target.dir/build
-.PHONY : _catkin_empty_exported_target/fast
-
-#=============================================================================
 # Target rules for targets named roscpp_generate_messages_py
 
 # Build rule for target.
@@ -307,7 +294,7 @@ roscpp_generate_messages_py: cmake_check_build_system
 
 # fast build rule for target.
 roscpp_generate_messages_py/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/roscpp_generate_messages_py.dir/build.make beginner_tutorials/CMakeFiles/roscpp_generate_messages_py.dir/build
+	$(MAKE) -f testrig/CMakeFiles/roscpp_generate_messages_py.dir/build.make testrig/CMakeFiles/roscpp_generate_messages_py.dir/build
 .PHONY : roscpp_generate_messages_py/fast
 
 #=============================================================================
@@ -320,7 +307,7 @@ roscpp_generate_messages_eus: cmake_check_build_system
 
 # fast build rule for target.
 roscpp_generate_messages_eus/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/roscpp_generate_messages_eus.dir/build.make beginner_tutorials/CMakeFiles/roscpp_generate_messages_eus.dir/build
+	$(MAKE) -f testrig/CMakeFiles/roscpp_generate_messages_eus.dir/build.make testrig/CMakeFiles/roscpp_generate_messages_eus.dir/build
 .PHONY : roscpp_generate_messages_eus/fast
 
 #=============================================================================
@@ -333,7 +320,7 @@ roscpp_generate_messages_lisp: cmake_check_build_system
 
 # fast build rule for target.
 roscpp_generate_messages_lisp/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/roscpp_generate_messages_lisp.dir/build.make beginner_tutorials/CMakeFiles/roscpp_generate_messages_lisp.dir/build
+	$(MAKE) -f testrig/CMakeFiles/roscpp_generate_messages_lisp.dir/build.make testrig/CMakeFiles/roscpp_generate_messages_lisp.dir/build
 .PHONY : roscpp_generate_messages_lisp/fast
 
 #=============================================================================
@@ -346,7 +333,7 @@ rosgraph_msgs_generate_messages_cpp: cmake_check_build_system
 
 # fast build rule for target.
 rosgraph_msgs_generate_messages_cpp/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build.make beginner_tutorials/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build
+	$(MAKE) -f testrig/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build.make testrig/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build
 .PHONY : rosgraph_msgs_generate_messages_cpp/fast
 
 #=============================================================================
@@ -359,7 +346,7 @@ std_msgs_generate_messages_lisp: cmake_check_build_system
 
 # fast build rule for target.
 std_msgs_generate_messages_lisp/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/std_msgs_generate_messages_lisp.dir/build.make beginner_tutorials/CMakeFiles/std_msgs_generate_messages_lisp.dir/build
+	$(MAKE) -f testrig/CMakeFiles/std_msgs_generate_messages_lisp.dir/build.make testrig/CMakeFiles/std_msgs_generate_messages_lisp.dir/build
 .PHONY : std_msgs_generate_messages_lisp/fast
 
 #=============================================================================
@@ -372,7 +359,7 @@ roscpp_generate_messages_cpp: cmake_check_build_system
 
 # fast build rule for target.
 roscpp_generate_messages_cpp/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/roscpp_generate_messages_cpp.dir/build.make beginner_tutorials/CMakeFiles/roscpp_generate_messages_cpp.dir/build
+	$(MAKE) -f testrig/CMakeFiles/roscpp_generate_messages_cpp.dir/build.make testrig/CMakeFiles/roscpp_generate_messages_cpp.dir/build
 .PHONY : roscpp_generate_messages_cpp/fast
 
 #=============================================================================
@@ -385,7 +372,7 @@ rosgraph_msgs_generate_messages_eus: cmake_check_build_system
 
 # fast build rule for target.
 rosgraph_msgs_generate_messages_eus/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/build.make beginner_tutorials/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/build
+	$(MAKE) -f testrig/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/build.make testrig/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/build
 .PHONY : rosgraph_msgs_generate_messages_eus/fast
 
 #=============================================================================
@@ -398,7 +385,7 @@ rosgraph_msgs_generate_messages_lisp: cmake_check_build_system
 
 # fast build rule for target.
 rosgraph_msgs_generate_messages_lisp/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build.make beginner_tutorials/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build
+	$(MAKE) -f testrig/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build.make testrig/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build
 .PHONY : rosgraph_msgs_generate_messages_lisp/fast
 
 #=============================================================================
@@ -411,7 +398,7 @@ std_msgs_generate_messages_cpp: cmake_check_build_system
 
 # fast build rule for target.
 std_msgs_generate_messages_cpp/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/std_msgs_generate_messages_cpp.dir/build.make beginner_tutorials/CMakeFiles/std_msgs_generate_messages_cpp.dir/build
+	$(MAKE) -f testrig/CMakeFiles/std_msgs_generate_messages_cpp.dir/build.make testrig/CMakeFiles/std_msgs_generate_messages_cpp.dir/build
 .PHONY : std_msgs_generate_messages_cpp/fast
 
 #=============================================================================
@@ -424,7 +411,7 @@ rosgraph_msgs_generate_messages_nodejs: cmake_check_build_system
 
 # fast build rule for target.
 rosgraph_msgs_generate_messages_nodejs/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build.make beginner_tutorials/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build
+	$(MAKE) -f testrig/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build.make testrig/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build
 .PHONY : rosgraph_msgs_generate_messages_nodejs/fast
 
 #=============================================================================
@@ -437,7 +424,7 @@ rosgraph_msgs_generate_messages_py: cmake_check_build_system
 
 # fast build rule for target.
 rosgraph_msgs_generate_messages_py/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build.make beginner_tutorials/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build
+	$(MAKE) -f testrig/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build.make testrig/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build
 .PHONY : rosgraph_msgs_generate_messages_py/fast
 
 #=============================================================================
@@ -450,7 +437,7 @@ std_msgs_generate_messages_eus: cmake_check_build_system
 
 # fast build rule for target.
 std_msgs_generate_messages_eus/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/std_msgs_generate_messages_eus.dir/build.make beginner_tutorials/CMakeFiles/std_msgs_generate_messages_eus.dir/build
+	$(MAKE) -f testrig/CMakeFiles/std_msgs_generate_messages_eus.dir/build.make testrig/CMakeFiles/std_msgs_generate_messages_eus.dir/build
 .PHONY : std_msgs_generate_messages_eus/fast
 
 #=============================================================================
@@ -463,7 +450,7 @@ std_msgs_generate_messages_nodejs: cmake_check_build_system
 
 # fast build rule for target.
 std_msgs_generate_messages_nodejs/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build.make beginner_tutorials/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build
+	$(MAKE) -f testrig/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build.make testrig/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build
 .PHONY : std_msgs_generate_messages_nodejs/fast
 
 #=============================================================================
@@ -476,7 +463,7 @@ roscpp_generate_messages_nodejs: cmake_check_build_system
 
 # fast build rule for target.
 roscpp_generate_messages_nodejs/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/roscpp_generate_messages_nodejs.dir/build.make beginner_tutorials/CMakeFiles/roscpp_generate_messages_nodejs.dir/build
+	$(MAKE) -f testrig/CMakeFiles/roscpp_generate_messages_nodejs.dir/build.make testrig/CMakeFiles/roscpp_generate_messages_nodejs.dir/build
 .PHONY : roscpp_generate_messages_nodejs/fast
 
 #=============================================================================
@@ -489,60 +476,8 @@ std_msgs_generate_messages_py: cmake_check_build_system
 
 # fast build rule for target.
 std_msgs_generate_messages_py/fast:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/std_msgs_generate_messages_py.dir/build.make beginner_tutorials/CMakeFiles/std_msgs_generate_messages_py.dir/build
+	$(MAKE) -f testrig/CMakeFiles/std_msgs_generate_messages_py.dir/build.make testrig/CMakeFiles/std_msgs_generate_messages_py.dir/build
 .PHONY : std_msgs_generate_messages_py/fast
-
-#=============================================================================
-# Target rules for targets named lumbermill_node
-
-# Build rule for target.
-lumbermill_node: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 lumbermill_node
-.PHONY : lumbermill_node
-
-# fast build rule for target.
-lumbermill_node/fast:
-	$(MAKE) -f skogstomten/lumber_example/CMakeFiles/lumbermill_node.dir/build.make skogstomten/lumber_example/CMakeFiles/lumbermill_node.dir/build
-.PHONY : lumbermill_node/fast
-
-#=============================================================================
-# Target rules for targets named lumberjack_node
-
-# Build rule for target.
-lumberjack_node: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 lumberjack_node
-.PHONY : lumberjack_node
-
-# fast build rule for target.
-lumberjack_node/fast:
-	$(MAKE) -f skogstomten/lumber_example/CMakeFiles/lumberjack_node.dir/build.make skogstomten/lumber_example/CMakeFiles/lumberjack_node.dir/build
-.PHONY : lumberjack_node/fast
-
-#=============================================================================
-# Target rules for targets named lumbershop_node
-
-# Build rule for target.
-lumbershop_node: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 lumbershop_node
-.PHONY : lumbershop_node
-
-# fast build rule for target.
-lumbershop_node/fast:
-	$(MAKE) -f skogstomten/lumber_example/CMakeFiles/lumbershop_node.dir/build.make skogstomten/lumber_example/CMakeFiles/lumbershop_node.dir/build
-.PHONY : lumbershop_node/fast
-
-#=============================================================================
-# Target rules for targets named motor_controller_node
-
-# Build rule for target.
-motor_controller_node: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 motor_controller_node
-.PHONY : motor_controller_node
-
-# fast build rule for target.
-motor_controller_node/fast:
-	$(MAKE) -f skogstomten/testrig/CMakeFiles/motor_controller_node.dir/build.make skogstomten/testrig/CMakeFiles/motor_controller_node.dir/build
-.PHONY : motor_controller_node/fast
 
 # Help Target
 help:
@@ -566,7 +501,6 @@ help:
 	@echo "... gmock"
 	@echo "... gtest_main"
 	@echo "... gtest"
-	@echo "... _catkin_empty_exported_target"
 	@echo "... roscpp_generate_messages_py"
 	@echo "... roscpp_generate_messages_eus"
 	@echo "... roscpp_generate_messages_lisp"
@@ -582,10 +516,6 @@ help:
 	@echo "... std_msgs_generate_messages_nodejs"
 	@echo "... roscpp_generate_messages_nodejs"
 	@echo "... std_msgs_generate_messages_py"
-	@echo "... lumbermill_node"
-	@echo "... lumberjack_node"
-	@echo "... lumbershop_node"
-	@echo "... motor_controller_node"
 .PHONY : help
 
 
